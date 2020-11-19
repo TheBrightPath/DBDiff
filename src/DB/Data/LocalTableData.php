@@ -4,8 +4,13 @@ use DBDiff\Params\ParamsFactory;
 use DBDiff\Diff\InsertData;
 use DBDiff\Diff\UpdateData;
 use DBDiff\Diff\DeleteData;
-use DBDiff\Exceptions\DataException;
 use DBDiff\Logger;
+use Diff\DiffOp\DiffOpAdd;
+use Diff\DiffOp\DiffOpRemove;
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 
 class LocalTableData {
@@ -68,7 +73,7 @@ class LocalTableData {
         $constraint = $this->getConstraint($table);
         $comments = $this->getComments($table);
 
-        $this->source->setFetchMode(\PDO::FETCH_NAMED);
+        $this->setFetchMode(\PDO::FETCH_NAMED);
         $result1 = $this->source->select(
            "SELECT $columnsAUtf FROM `{$db1}`.`{$table}` as a
             LEFT JOIN `{$db2}`.`{$table}` as b ON $keyCols WHERE $keyNulls2 $constraint
@@ -77,20 +82,20 @@ class LocalTableData {
            "SELECT $columnsBUtf FROM `{$db2}`.`{$table}` as b
             LEFT JOIN `{$db1}`.`{$table}` as a ON $keyCols WHERE $keyNulls1 $constraint
         ");
-        $this->source->setFetchMode(\PDO::FETCH_ASSOC);
+        $this->setFetchMode(\PDO::FETCH_ASSOC);
 
         foreach ($result1 as $row) {
             $diffSequence[] = new InsertData($table, [
-                'keys' => array_only($row, $key),
-                'diff' => new \Diff\DiffOp\DiffOpAdd(array_except($row, '_connection')),
-                'extra' => array_only($row, $comments),
+                'keys' => Arr::only($row, $key),
+                'diff' => new DiffOpAdd(Arr::except($row, '_connection')),
+                'extra' => Arr::only($row, $comments),
             ]);
         }
         foreach ($result2 as $row) {
             $diffSequence[] = new DeleteData($table, [
-                'keys' => array_only($row, $key),
-                'diff' => new \Diff\DiffOp\DiffOpRemove(array_except($row, '_connection')),
-                'extra' => array_only($row, $comments),
+                'keys' => Arr::only($row, $key),
+                'diff' => new DiffOpRemove(Arr::except($row, '_connection')),
+                'extra' => Arr::only($row, $comments),
            ]);
         }
 
@@ -145,7 +150,7 @@ class LocalTableData {
             return "a.{$el} = b.{$el}";
         }, $key));
 
-        $this->source->setFetchMode(\PDO::FETCH_NAMED);
+        $this->setFetchMode(\PDO::FETCH_NAMED);
         $result = $this->source->select(
            "SELECT * FROM (
                 SELECT $columnsAas, $columnsBas, MD5(concat($columnsA)) AS hash1,
@@ -155,12 +160,12 @@ class LocalTableData {
                 INNER JOIN `{$db2}`.`{$table}` as b
                 ON $keyCols {$constraint}
             ) t WHERE hash1 <> hash2 || nullvalues1 <> nullvalues2");
-        $this->source->setFetchMode(\PDO::FETCH_ASSOC);
+        $this->setFetchMode(\PDO::FETCH_ASSOC);
         
         foreach ($result as $row) {
             $diff = []; $keys = []; $extra = [];
             foreach ($row as $k => $value) {
-                if (starts_with($k, 's_')) {
+                if (Str::startsWith($k, 's_')) {
                     $theKey = substr($k, 2);
                     $targetKey = 't_'.$theKey;
                     $sourceValue = $value;
@@ -194,6 +199,16 @@ class LocalTableData {
 
     protected function getComments($table) {
         return $this->manager->params->get('comments', $table);
+    }
+
+    private function setFetchMode($fetchMode = \PDO::FETCH_ASSOC)
+    {
+        $dispatcher = new Dispatcher();
+        $dispatcher->listen(StatementPrepared::class, function ($event) use ($fetchMode) {
+            $event->statement->setFetchMode($fetchMode);
+        });
+
+        $this->source->setEventDispatcher($dispatcher);
     }
 
 }

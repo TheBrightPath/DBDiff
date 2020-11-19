@@ -2,6 +2,9 @@
 
 use Illuminate\Database\Capsule\Manager as Capsule;
 use DBDiff\Exceptions\DBException;
+use Illuminate\Database\Events\StatementPrepared;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 
 
 class DBManager {
@@ -20,6 +23,12 @@ class DBManager {
     function __construct($params = null) {
         $this->params = $params;
         $this->capsule = new Capsule;
+        $dispatcher = new Dispatcher();
+        $dispatcher->listen(StatementPrepared::class, function ($event) {
+            $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
+        });
+
+        $this->capsule->setEventDispatcher($dispatcher);
     }
 
     public function connect($params = null) {
@@ -69,7 +78,7 @@ class DBManager {
     public function getTables($connection) {
         $params = $this->params;
         $result = $this->getDB($connection)->select("show tables");
-        $result = array_flatten($result);
+        $result = Arr::flatten($result);
         if (isset($params->tablesToDiff)) {
             $result = array_intersect($result, $params->tablesToDiff);
         }
@@ -81,7 +90,7 @@ class DBManager {
 
     public function getColumns($connection, $table) {
         $result = $this->getDB($connection)->select("show columns from `$table`");
-        return array_pluck($result, 'Field');
+        return Arr::pluck($result, 'Field');
     }
 
     public function getKey($connection, $table) {
