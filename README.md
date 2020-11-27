@@ -37,12 +37,25 @@ DBDiff is a MIT-licensed open source project with its ongoing development made p
 -   Works with just MySQL for now, but we will be expanding to other DBs in the future on request (please create an issue and vote on it!)
 
 ## Pre-requisites
-1. You will need to have access to the command-line, for Linux/Mac a Terminal or on Windows it will be a command prompt (`cmd`)
+1. You will need to have access to the command-line, for Linux/Mac a Terminal or on Windows it will be a command prompt (`cmd`) or PowerShell
 2. You will need to have git installed: http://git-scm.com/downloads
-3. You will need to have PHP installed (version 5.4.x): http://php.net/manual/en/install.php
+3. You will need to have PHP installed (version 7.3.x): http://php.net/manual/en/install.php
 4. You will need to have Composer installed which is a Dependency Manager for PHP: https://getcomposer.org
 
 _Note: Make a note of where `composer.phar` is installed as we will need it later on during Setup_
+
+## Supported PHP Versions
+
+_Other versions may work but are not actively supported. Feel free to contribute a PR to add official support._
+
+* PHP 7.3.x
+
+## Supported MySQL Database Versions
+
+_Other versions may work but are not actively supported. Feel free to contribute a PR to add official support._
+
+* MySQL 5.7.x
+* MySQL 8.0.x
 
 ## Installation
 On the command-line, use `git` to clone the ssh version:
@@ -89,6 +102,52 @@ A `dist` folder should be created containing the following files:
 Feel free to rename `dbdiff.phar` to `dbdiff` and move it to `/usr/local/bin` or another directory of your choice.
 
 You can also add it to your system's path if you wish to make it globally available on your system as a utility.
+
+## Docker
+
+You may now use `docker` and `docker-compose` to create a local environment for DBDiff (for testing or production), including a PHP server with a database and the DBDiff CLI available as a service.
+
+Please ensure you have `docker` and/or `docker-compose` installed locally, as well as a download of the git repository, before continuing.
+
+_Note: Please run these commands from the root of the DBDiff folder. Also the commands may need to be prepended with `sudo` on some systems._
+
+### Docker Standalone DBDiff CLI with PHP 7.3
+
+```bash
+# Build DBDiff CLI Image
+docker build --tag "dbdiff:latest" --file "docker/Dockerfile" .
+```
+
+```bash
+# Run DBDiff CLI Image as a Container
+docker run -i -t --ipc=host --shm-size="1g" "dbdiff:latest" <command>
+```
+
+```bash
+# Remove DBDiff CLI Image
+docker image rm dbdiff:latest
+```
+
+### Docker Compose DBDiff Environment with PHP 7.3, phpMyAdmin & MySQL 5.7
+
+```bash
+docker-compose -f docker-compose.yml -f docker/docker-compose.mysql-5.7.yml up --build
+# Access phpMyAdmin at localhost:8080 with Username: root, Password: rootpass
+```
+
+### Docker Compose DBDiff Environment with PHP 7.3, phpMyAdmin & MySQL 8.0
+
+
+```bash
+docker-compose -f docker-compose.yml -f docker/docker-compose.mysql-8.0.yml up --build
+# Access phpMyAdmin at localhost:8080 with Username: root, Password: rootpass
+```
+
+### Removing Docker Compose DBDiff Environment
+
+```bash
+docker-compose down
+```
 
 ## Setup
 
@@ -159,10 +218,6 @@ Instead of looking for `.dbdiff`, this would look for `config.conf` (which shou
 	type: all
 	include: all
 	nocomments: true
-	tablesToDiff:
-	- table1
-	- table2
-	- table3
 	tablesToIgnore:
 	- table1
 	- table2
