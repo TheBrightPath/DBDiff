@@ -2,6 +2,7 @@
 
 namespace DBDiff;
 
+use DBDiff\Generators\SQLGenerator;
 use DBDiff\Params\DefaultParams;
 
 class Params
@@ -11,22 +12,54 @@ class Params
 
     /**
      * Params constructor.
+     *
+     * @param  \DBDiff\Params\Params  $primary
+     * @param  \DBDiff\Params\Params  $default
      */
-    public function __construct( $params )
-    {
+    public function __construct(
+        $primary,
+        $default = null
+    ) {
 
-        foreach ( $params as $param => &$value )
+        $params = array_unique(
+            array_merge(
+                array_keys( get_object_vars( $primary ) ),
+                array_keys( get_object_vars( $default ?? new \StdClass() ) )
+            )
+        );
+
+        foreach ( $params as $param )
         {
             $setter = 'set' . ucfirst( $param );
             if ( method_exists( $this, $setter ) )
             {
-                $this->$setter( $value );
+                // allow a setter to merge from default params
+                $this->$setter( $primary->$param ?? $default->$param, $default->$param ?? $this->$param );
             }
             else
             {
-                $this->$param = $value;
+                $this->$param = $primary->$param ?? $default->$param ?? $this->$param;
             }
         }
+
+        if ( $this->filters === null )
+        {
+            switch ( $this->format )
+            {
+            case 'sql':
+                $this->filters[] = SQLGenerator::class;
+                break;
+
+            default:
+                $class = 'DBDiff\\Generators\\' . ucfirst( $this->format ) . 'Generator';
+                if ( class_exists( $class ) )
+                {
+                    $this->filters[] = $class;
+                }
+
+            }
+        }
+
     }
 
 
@@ -156,6 +189,11 @@ class Params
      */
     public function setFilters( $filters ): Params
     {
+
+        if ( $filters === null )
+        {
+            return $this;
+        }
 
         $this->filters = (array) $filters;
 

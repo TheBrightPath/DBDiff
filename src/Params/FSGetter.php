@@ -6,12 +6,21 @@ use Symfony\Component\Yaml\Yaml;
 
 class FSGetter implements ParamsGetter {
 
+    /**
+     * @var \DBDiff\Params\Params
+     */
+    protected $params;
+
+
+    /**
+     * @param $params
+     */
     function __construct($params) {
         $this->params = $params;
     }
 
-    public function getParams() {
-        $params = new \StdClass;
+    public function getParams(): Params {
+        $params = new Params;
         $configFile = $this->getFile();
 
         if ($configFile) {
@@ -20,7 +29,7 @@ class FSGetter implements ParamsGetter {
                 foreach ($config as $key => $value) {
                     $this->setIn($params, $key, $value);
                 }
-            } catch (Exceptions $e) {
+            } catch (\Exception $e) {
                 throw new FSException("Error parsing config file");
             }
         }

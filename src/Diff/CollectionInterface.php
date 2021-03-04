@@ -6,6 +6,7 @@ use DBDiff\Params;
 
 interface CollectionInterface
     extends
+    Params\ParamsGetter,
     \ArrayAccess
 {
 
@@ -19,12 +20,6 @@ interface CollectionInterface
      * @return \DBDiff\Diff\Step[]
      */
     public function getData(): array;
-
-
-    /**
-     * @return \DBDiff\Params
-     */
-    public function getParams(): Params;
 
 
     /**

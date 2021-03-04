@@ -4,12 +4,12 @@ use DBDiff\Exceptions\CLIException;
 use DBDiff\Params;
 
 class ParamsFactory {
-    
+
     public static function get(...$path) {
 
         $params = static::parse();
 
-        if (empty($params)) {
+        if (empty($path)) {
             return $params;
         }
 
@@ -32,7 +32,7 @@ class ParamsFactory {
         $fs = new FSGetter($paramsCLI);
         $paramsFS = $fs->getParams();
 
-        $params = new Params(array_merge((array) $paramsFS, (array) $paramsCLI));
+        $params = new Params($paramsCLI, $paramsFS);
 
         if (empty($params->server1)) {
             throw new CLIException("A server is required");

@@ -2,5 +2,5 @@
 
 
 interface ParamsGetter {
-    public function getParams();
+    public function getParams(): Params;
 }

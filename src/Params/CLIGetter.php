@@ -2,24 +2,60 @@
 
 use DBDiff\Exceptions\CLIException;
 use Aura\Cli\CliFactory;
-use Aura\Cli\Status;
 
 
 class CLIGetter implements ParamsGetter {
     
-    public function getParams() {
-        $params = new \StdClass;
+    public function getParams(): Params {
+        $params = new Params;
 
         $cliFactory = new CliFactory;
         $context = $cliFactory->newContext($GLOBALS);
-        $stdio = $cliFactory->newStdio();
 
         $getopt = $context->getopt([
-            'server1::', 'server2::', 'format::',
-            'template::', 'type::', 'include::',
-            'nocomments::', 'config::', 'output::', 'debug::'
+            /**  @see \DBDiff\Params\Params::$server1 */
+            'server1::',
+
+            /**  @see \DBDiff\Params\Params::$server2 */
+            'server2::',
+
+            /**  @see \DBDiff\Params\Params::$format */
+            'format:',
+
+            /**  @see \DBDiff\Params\Params::$template */
+            'template:',
+
+            /**  @see \DBDiff\Params\Params::$type */
+            'type:',
+
+            /**  @see \DBDiff\Params\Params::$include */
+            'include:',
+
+            /**  @see \DBDiff\Params\Params::$nocomments */
+            'nocomments::',
+
+            /**  @see \DBDiff\Params\Params::$config */
+            'config:',
+
+            /**  @see \DBDiff\Params\Params::$output */
+            'output:',
+
+            /**  @see \DBDiff\Params\Params::$debug */
+            'debug::',
+
+            /**  @see \DBDiff\Params\Params::$filters */
+            'filters*:',
+
+            /**  @see \DBDiff\Params\Params::$requires */
+            'requires*:',
+
+            /**  @see \DBDiff\Params\Params::$tablesToDiff */
+            'table*:',
+
+            /**  @see \DBDiff\Params\Params::$tablesToIgnore */
+            'ignore*:',
         ]);
-    
+
         $input = $getopt->get(1);
         if ($input) {
             $params->input = $this->parseInput($input);
@@ -29,22 +65,19 @@ class CLIGetter implements ParamsGetter {
             $params->server1 = $this->parseServer($getopt->get('--server1'));
         if ($getopt->get('--server2'))
             $params->server2 = $this->parseServer($getopt->get('--server2'));
-        if ($getopt->get('--format'))
-            $params->format = $getopt->get('--format');
-        if ($getopt->get('--template'))
-            $params->template = $getopt->get('--template');
-        if ($getopt->get('--type'))
-            $params->type = $getopt->get('--type');
-        if ($getopt->get('--include'))
-            $params->include = $getopt->get('--include');
-        if ($getopt->get('--nocomments'))
-            $params->nocomments = $getopt->get('--nocomments');
-        if ($getopt->get('--config'))
-            $params->config = $getopt->get('--config');
-        if ($getopt->get('--output'))
-            $params->output = $getopt->get('--output');
-        if ($getopt->get('--debug'))
-            $params->debug = $getopt->get('--debug');
+
+        $params->format         = $getopt->get( '--format' );
+        $params->template       = $getopt->get( '--template' );
+        $params->type           = $getopt->get( '--type' );
+        $params->include        = $getopt->get( '--include' );
+        $params->nocomments     = $getopt->get( '--nocomments' );
+        $params->config         = $getopt->get( '--config' );
+        $params->output         = $getopt->get( '--output' );
+        $params->debug          = $getopt->get( '--debug' );
+        $params->filters        = $getopt->get( '--filters' );
+        $params->requires       = $getopt->get( '--requires' );
+        $params->tablesToDiff   = $getopt->get( '--table' );
+        $params->tablesToIgnore = $getopt->get( '--ignore' );
 
         return $params;
     }

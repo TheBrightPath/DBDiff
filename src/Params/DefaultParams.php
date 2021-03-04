@@ -1,81 +1,97 @@
-<?php namespace DBDiff\Params;
+<?php
 
+namespace DBDiff\Params;
 
-use DBDiff\Generators\SQLGenerator;
+class DefaultParams
+    extends
+    Params
+{
 
-class DefaultParams {
-    
-    // Specify the source db connection details. If there is only one
+//  public properties
+
+    /**
+     * @inheritdoc
+     */
     public $server1 = [];
 
-    // Specify the target db connection details
+    /**
+     * @inheritdoc
+     */
     public $server2 = [];
 
+    /**
+     * @inheritdoc
+     */
     public $format = 'sql';
 
-    // Specifies the output template, if any. By default will be plain SQL
+    /**
+     * @inheritdoc
+     */
     public $template = '';
 
-    // Specifies the type of diff to do either on the schema, data or both
+    /**
+     * @inheritdoc
+     */
     public $type = 'schema';
 
-    // Specified whether to include the up, down or both data in the output
+    /**
+     * @inheritdoc
+     */
     public $include = 'up';
 
-    /* 
-     By default automated comments starting with the hash (#) character are
-     included in the output file, which can be removed with this parameter
-    */
+    /**
+     * @inheritdoc
+     */
     public $nocomments = false;
 
-    /* 
-     By default, DBDiff will look for a .dbdiff file in the current directory
-     which is valid YAML, which may also be overridden with a config file that
-     lists the database host, user, port and password of the source and target
-     DBs in YAML format (instead of using the command line for it), or any of
-     the other settings e.g. the format, template, type, include, no­comments.
-     Please note: a command­line parameter will always override any config file.
-    */
-    public $config = null;
-
-    /* 
-     By default will output to the same directory the command is run in if no directory is
-     specified. If a directory is specified, it should exist, otherwise an error will be thrown
-    */
+    /**
+     * @inheritdoc
+     */
     public $output = null;
 
-    /* 
-     Enable or disable warnings
-    */
+    /**
+     * @inheritdoc
+     */
     public $debug = false;
 
-    /*
-     The penultimate parameter is what to compare: db1.table1:db2.table3 or​ db1:db2 
-     This tool can compare just one table or all tables (entire db) from the database
-    */
+    /**
+     * @inheritdoc
+     */
     public $input = [];
 
     /**
-     * @var \DBDiff\Filters\FilterInterface[];
-     * Filters to be called, one by one, handing it's predecessor as an argument
+     * @inheritdoc
      */
-    public $filters = [ SQLGenerator::class ];
+    public $filters;
 
-    /** @var string[] filenames to be required */
+    /**
+     * @inheritdoc
+     */
     public $requires = [];
 
-    /** @var string|null  */
-    public $defaultTemplateString = null;
+    /**
+     * @inheritdoc
+     */
+    public $defaultTemplateString;
 
-    /** @var array[]|null  */
-    public $fieldsToIgnore = null;
+    /**
+     * @inheritdoc
+     */
+    public $fieldsToIgnore;
 
-   /** @var array[]|null  */
-    public $tablesToDiff = null;
+    /**
+     * @inheritdoc
+     */
+    public $tablesToDiff;
 
-    /** @var string[]|null  */
-    public $tablesToIgnore = null;
+    /**
+     * @inheritdoc
+     */
+    public $tablesToIgnore;
 
-    /** @var array[]|null */
-    public $constraints = null;
+    /**
+     * @inheritdoc
+     */
+    public $constraints;
+
 }
