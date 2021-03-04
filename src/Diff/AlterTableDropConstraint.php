@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AlterTableDropConstraint {
+class AlterTableDropConstraint extends Step {
 
     function __construct($table, $name, $diff) {
         $this->table = $table;

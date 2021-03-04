@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AlterTableChangeColumn {
+class AlterTableChangeColumn extends Step {
 
     function __construct($table, $column, $diff) {
         $this->table = $table;

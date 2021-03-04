@@ -10,6 +10,16 @@ use DBDiff\Logger;
 
 class LocalTableData {
 
+    /** @var \DBDiff\DB\DBManager */
+    protected $manager;
+
+    /** @var \Illuminate\Database\Connection */
+    protected $source;
+
+    /** @var \Illuminate\Database\Connection */
+    protected $target;
+
+
     function __construct($manager) {
         $this->manager = $manager;
         $this->source = $this->manager->getDB('source');
@@ -55,28 +65,33 @@ class LocalTableData {
         $keyNulls1 = implode(' AND ', $keyNull($key, 'a'));
         $keyNulls2 = implode(' AND ', $keyNull($key, 'b'));
 
+        $constraint = $this->getConstraint($table);
+        $comments = $this->getComments($table);
+
         $this->source->setFetchMode(\PDO::FETCH_NAMED);
         $result1 = $this->source->select(
            "SELECT $columnsAUtf FROM `{$db1}`.`{$table}` as a
-            LEFT JOIN `{$db2}`.`{$table}` as b ON $keyCols WHERE $keyNulls2
+            LEFT JOIN `{$db2}`.`{$table}` as b ON $keyCols WHERE $keyNulls2 $constraint
         ");
         $result2 = $this->source->select(
            "SELECT $columnsBUtf FROM `{$db2}`.`{$table}` as b
-            LEFT JOIN `{$db1}`.`{$table}` as a ON $keyCols WHERE $keyNulls1
+            LEFT JOIN `{$db1}`.`{$table}` as a ON $keyCols WHERE $keyNulls1 $constraint
         ");
         $this->source->setFetchMode(\PDO::FETCH_ASSOC);
 
         foreach ($result1 as $row) {
             $diffSequence[] = new InsertData($table, [
                 'keys' => array_only($row, $key),
-                'diff' => new \Diff\DiffOp\DiffOpAdd(array_except($row, '_connection'))
+                'diff' => new \Diff\DiffOp\DiffOpAdd(array_except($row, '_connection')),
+                'extra' => array_only($row, $comments),
             ]);
         }
         foreach ($result2 as $row) {
             $diffSequence[] = new DeleteData($table, [
                 'keys' => array_only($row, $key),
-                'diff' => new \Diff\DiffOp\DiffOpRemove(array_except($row, '_connection'))
-            ]);
+                'diff' => new \Diff\DiffOp\DiffOpRemove(array_except($row, '_connection')),
+                'extra' => array_only($row, $comments),
+           ]);
         }
 
         return $diffSequence;
@@ -98,6 +113,9 @@ class LocalTableData {
             $columns2 = array_diff($columns2, $params->fieldsToIgnore[$table]);
         }
         
+        $constraint = $this->getConstraint($table);
+        $comments = $this->getComments($table);
+
         $wrapAs = function($arr, $p1, $p2) {
             return array_map(function($el) use ($p1, $p2) {
                 return "`{$p1}`.`{$el}` as `{$p2}{$el}`";
@@ -135,12 +153,12 @@ class LocalTableData {
                 CONCAT($columnsA0) AS nullvalues1, CONCAT($columnsB0) AS nullvalues2
                 FROM `{$db1}`.`{$table}` as a
                 INNER JOIN `{$db2}`.`{$table}` as b
-                ON $keyCols
+                ON $keyCols {$constraint}
             ) t WHERE hash1 <> hash2 || nullvalues1 <> nullvalues2");
         $this->source->setFetchMode(\PDO::FETCH_ASSOC);
         
         foreach ($result as $row) {
-            $diff = []; $keys = [];
+            $diff = []; $keys = []; $extra = [];
             foreach ($row as $k => $value) {
                 if (starts_with($k, 's_')) {
                     $theKey = substr($k, 2);
@@ -148,7 +166,8 @@ class LocalTableData {
                     $sourceValue = $value;
                     
                     if (in_array($theKey, $key)) $keys[$theKey] = $value;
-                    
+                    if (in_array($theKey, $comments)) $extra[$theKey] = $value;
+
                     if (isset($row[$targetKey])) {
                         $targetValue = $row[$targetKey];
                         if ($sourceValue != $targetValue) {
@@ -161,11 +180,20 @@ class LocalTableData {
             }
             $diffSequence[] = new UpdateData($table, [
                 'keys' => $keys,
-                'diff' => $diff
+                'diff' => $diff,
+                'extra' => $extra,
             ]);
         }
 
         return $diffSequence;
+    }
+
+    protected function getConstraint($table) {
+        return $this->manager->params->get('constraints', $table) ?? '';
+    }
+
+    protected function getComments($table) {
+        return $this->manager->params->get('comments', $table);
     }
 
 }

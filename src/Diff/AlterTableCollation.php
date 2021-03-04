@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AlterTableCollation {
+class AlterTableCollation extends Step {
 
     function __construct($table, $collation, $prevCollation) {
         $this->table  = $table;

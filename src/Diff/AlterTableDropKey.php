@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AlterTableDropKey {
+class AlterTableDropKey extends Step {
 
     function __construct($table, $key, $diff) {
         $this->table = $table;

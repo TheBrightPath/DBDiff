@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class DropTable {
+class DropTable extends Step {
 
     function __construct($table, $connection) {
         $this->table = $table;

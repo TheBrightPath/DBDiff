@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AlterTableAddConstraint {
+class AlterTableAddConstraint extends Step {
 
     function __construct($table, $name, $diff) {
         $this->table = $table;

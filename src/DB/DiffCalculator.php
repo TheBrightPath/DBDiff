@@ -4,19 +4,36 @@ use DBDiff\DB\Schema\DBSchema;
 use DBDiff\DB\Schema\TableSchema;
 use DBDiff\DB\Data\DBData;
 use DBDiff\DB\Data\TableData;
+use DBDiff\Diff\Collection;
+use DBDiff\Diff\CollectionInterface;
+use DBDiff\Filters\FilterInterface;
+use DBDiff\Helpers\DiffProxyTrait;
+use DBDiff\Params;
 
+class DiffCalculator implements FilterInterface {
 
-class DiffCalculator {
+    use DiffProxyTrait;
 
-    function __construct() {
-        $this->manager = new DBManager;
+    /**
+     * @var \DBDiff\DB\DBManager
+     */
+    protected DBManager $manager;
+
+    function __construct( $diff, $params = null) {
+        $this->manager = new DBManager($params);
     }
-    
-    public function getDiff($params) {
+
+    public function getDiff(): CollectionInterface {
+
+        if ($this->diff !== null) {
+            return $this->diff;
+        }
         
         // Connect and test accessibility
-        $this->manager->connect($params);
-        $this->manager->testResources($params);
+        $this->manager->connect();
+        $this->manager->testResources();
+
+        $params = $this->manager->params;
 
         // Schema diff
         $schemaDiff = [];
@@ -42,10 +59,13 @@ class DiffCalculator {
             }
         }
 
-        return [
-            'schema' => $schemaDiff,
-            'data'   => $dataDiff,
-        ];
+        return $this->diff = new Collection($params, $schemaDiff, $dataDiff);
 
     }
+
+    public function getParams(): Params
+    {
+       return $this->manager->params;
+    }
+
 }

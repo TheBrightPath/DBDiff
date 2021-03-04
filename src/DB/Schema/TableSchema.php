@@ -1,7 +1,6 @@
 <?php namespace DBDiff\DB\Schema;
 
 use Diff\Differ\MapDiffer;
-use Diff\Differ\ListDiffer;
 
 use DBDiff\Diff\AlterTableEngine;
 use DBDiff\Diff\AlterTableCollation;
@@ -17,8 +16,6 @@ use DBDiff\Diff\AlterTableDropKey;
 use DBDiff\Diff\AlterTableAddConstraint;
 use DBDiff\Diff\AlterTableChangeConstraint;
 use DBDiff\Diff\AlterTableDropConstraint;
-
-use DBDiff\SQLGen\Schema\SQL;
 
 use DBDiff\Logger;
 

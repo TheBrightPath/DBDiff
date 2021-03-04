@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class AddTable {
+class AddTable extends Step {
 
     function __construct($table, $connection) {
         $this->table = $table;

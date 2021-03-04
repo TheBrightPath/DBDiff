@@ -1,6 +1,8 @@
 <?php namespace DBDiff\Params;
 
 
+use DBDiff\Generators\SQLGenerator;
+
 class DefaultParams {
     
     // Specify the source db connection details. If there is only one
@@ -53,4 +55,24 @@ class DefaultParams {
     */
     public $input = [];
 
+    /**
+     * @var \DBDiff\Filters\FilterInterface[];
+     * Filters to be called, one by one, handing it's predecessor as an argument
+     */
+    public $filters = [ SQLGenerator::class ];
+
+    /** @var string[] filenames to be required */
+    public $requires = [];
+
+    /** @var string|null  */
+    public $defaultTemplateString = null;
+
+    /** @var array[]|null  */
+    public $fieldsToIgnore = null;
+
+    /** @var string[]|null  */
+    public $tablesToIgnore = null;
+
+    /** @var array[]|null */
+    public $constraints = null;
 }

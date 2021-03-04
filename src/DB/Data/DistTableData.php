@@ -3,11 +3,20 @@
 use DBDiff\Diff\InsertData;
 use DBDiff\Diff\UpdateData;
 use DBDiff\Diff\DeleteData;
-use DBDiff\Exceptions\DataException;
 use DBDiff\Logger;
 
 
 class DistTableData {
+
+    /** @var \DBDiff\DB\DBManager */
+    protected $manager;
+
+    /** @var \Illuminate\Database\Connection */
+    protected $source;
+
+    /** @var \Illuminate\Database\Connection */
+    protected $target;
+
 
     function __construct($manager) {
         $this->manager = $manager;

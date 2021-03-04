@@ -2,10 +2,7 @@
 
 use DBDiff\Params\ParamsFactory;
 use DBDiff\DB\DiffCalculator;
-use DBDiff\SQLGen\SQLGenerator;
 use DBDiff\Exceptions\BaseException;
-use DBDiff\Logger;
-use DBDiff\Templater;
 
 
 class DBDiff {
@@ -16,24 +13,29 @@ class DBDiff {
         ini_set('memory_limit', '512M');
 
         try {
+            /** @var \DBDiff\Params\DefaultParams $params */
             $params = ParamsFactory::get();
 
             // Diff
-            $diffCalculator = new DiffCalculator;
-            $diff = $diffCalculator->getDiff($params);
+            $diffCalculator = new DiffCalculator(null, $params);
+            $diff = $diffCalculator->getDiff();
 
             // Empty diff
             if (empty($diff['schema']) && empty($diff['data'])) {
                 Logger::info("Identical resources");
             } else {
-                // SQL
-                $sqlGenerator = new SQLGenerator($diff);
+
+                foreach ( $params->filters as $filter )
+                {
+                    $diff = new $filter($diff->getDiff(), $params);
+                }
+
                 $up =''; $down = '';
                 if ($params->include !== 'down') {
-                    $up = $sqlGenerator->getUp();
+                    $up = $diff->getUp();
                 }
                 if ($params->include !== 'up') {
-                    $down = $sqlGenerator->getDown();
+                    $down = $diff->getDown();
                 }
 
                 // Generate

@@ -6,11 +6,24 @@ use DBDiff\Exceptions\DBException;
 
 class DBManager {
 
-    function __construct() {
+    /**
+     *  @var \DBDiff\Params
+     */
+    public $params;
+
+    /**
+     * @var \Illuminate\Database\Capsule\Manager
+     */
+    private Capsule $capsule;
+
+
+    function __construct($params = null) {
+        $this->params = $params;
         $this->capsule = new Capsule;
     }
 
-    public function connect($params) {
+    public function connect($params = null) {
+        $this->params = $params = $params ?? $this->params;
         foreach ($params->input as $key => $input) {
             if ($key === 'kind') continue;
             $server = $params->{$input['server']};
@@ -28,7 +41,8 @@ class DBManager {
         }
     }
 
-    public function testResources($params) {
+    public function testResources() {
+        $params = $this->params;
         $this->testResource($params->input['source'], 'source');
         $this->testResource($params->input['target'], 'target');
     }
@@ -63,6 +77,10 @@ class DBManager {
     }
 
     public function getKey($connection, $table) {
+        $ukey = $this->params->get('compareBy', $table);
+        if ($ukey !== null) {
+            return $ukey;
+        }
         $keys = $this->getDB($connection)->select("show indexes from `$table`");
         $ukey = [];
         foreach ($keys as $key) {

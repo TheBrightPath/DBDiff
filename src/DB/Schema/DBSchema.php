@@ -7,18 +7,20 @@ use DBDiff\Diff\SetDBCollation;
 use DBDiff\Diff\SetDBCharset;
 use DBDiff\Diff\DropTable;
 use DBDiff\Diff\AddTable;
-use DBDiff\Diff\AlterTable;
-
 
 
 class DBSchema {
 
-    function __construct($manager) {
+    /** @var \DBDiff\DB\DBManager */
+    protected $manager;
+
+
+    function __construct( $manager) {
         $this->manager = $manager;
     }
     
     function getDiff() {
-        $params = ParamsFactory::get();
+        $params = $this->manager->params;
 
         $diffs = [];
 

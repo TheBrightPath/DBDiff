@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class SetDBCollation {
+class SetDBCollation extends Step {
 
     function __construct($db, $collation, $prevCollation) {
         $this->db = $db;

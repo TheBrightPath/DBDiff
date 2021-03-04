@@ -1,13 +1,26 @@
 <?php namespace DBDiff\Params;
 
 use DBDiff\Exceptions\CLIException;
-
+use DBDiff\Params;
 
 class ParamsFactory {
     
-    public static function get() {
-        
-        $params = new DefaultParams;
+    public static function get(...$path) {
+
+        $params = static::parse();
+
+        if (empty($params)) {
+            return $params;
+        }
+
+        return $params->get(... $path);
+    }
+
+    protected static function parse() {
+
+        static $params;
+
+        if ($params !== null) { return $params; };
 
         $cli = new CLIGetter;
         $paramsCLI = $cli->getParams();
@@ -18,18 +31,12 @@ class ParamsFactory {
 
         $fs = new FSGetter($paramsCLI);
         $paramsFS = $fs->getParams();
-        $params = self::merge($params, $paramsFS);
 
-        $params = self::merge($params, $paramsCLI);
-        
+        $params = new Params(array_merge((array) $paramsFS, (array) $paramsCLI));
+
         if (empty($params->server1)) {
             throw new CLIException("A server is required");
         }
         return $params;
-
-    }
-
-    protected function merge($obj1, $obj2) {
-        return (object) array_merge((array) $obj1, (array) $obj2);
     }
 }

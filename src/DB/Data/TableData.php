@@ -9,6 +9,10 @@ use DBDiff\Logger;
 
 class TableData {
 
+    /** @var \DBDiff\DB\DBManager */
+    protected $manager;
+
+
     function __construct($manager) {
         $this->manager = $manager;
         $this->source = $this->manager->getDB('source');

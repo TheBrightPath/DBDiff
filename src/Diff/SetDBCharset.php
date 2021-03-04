@@ -1,7 +1,7 @@
 <?php namespace DBDiff\Diff;
 
 
-class SetDBCharset {
+class SetDBCharset extends Step {
 
     function __construct($db, $charset, $prevCharset) {
         $this->db = $db;

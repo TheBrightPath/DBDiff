@@ -1,10 +1,6 @@
 <?php namespace DBDiff\Diff;
 
 
-class UpdateData {
+class UpdateData extends DataStep {
 
-    function __construct($table, $diff) {
-        $this->table = $table;
-        $this->diff = $diff;
-    }
 }
