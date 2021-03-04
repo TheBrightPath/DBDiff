@@ -70,6 +70,9 @@ class DefaultParams {
     /** @var array[]|null  */
     public $fieldsToIgnore = null;
 
+   /** @var array[]|null  */
+    public $tablesToDiff = null;
+
     /** @var string[]|null  */
     public $tablesToIgnore = null;
 

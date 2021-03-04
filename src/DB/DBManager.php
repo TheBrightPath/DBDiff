@@ -67,8 +67,16 @@ class DBManager {
     }
 
     public function getTables($connection) {
+        $params = $this->params;
         $result = $this->getDB($connection)->select("show tables");
-        return array_flatten($result);
+        $result = array_flatten($result);
+        if (isset($params->tablesToDiff)) {
+            $result = array_intersect($result, $params->tablesToDiff);
+        }
+        if (isset($params->tablesToIgnore)) {
+            $result = array_diff($result, $params->tablesToIgnore);
+        }
+        return $result;
     }
 
     public function getColumns($connection, $table) {
