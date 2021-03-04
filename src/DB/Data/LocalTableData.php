@@ -57,12 +57,12 @@ class LocalTableData {
 
         $this->source->setFetchMode(\PDO::FETCH_NAMED);
         $result1 = $this->source->select(
-           "SELECT $columnsAUtf FROM {$db1}.{$table} as a
-            LEFT JOIN {$db2}.{$table} as b ON $keyCols WHERE $keyNulls2
+           "SELECT $columnsAUtf FROM `{$db1}`.`{$table}` as a
+            LEFT JOIN `{$db2}`.`{$table}` as b ON $keyCols WHERE $keyNulls2
         ");
         $result2 = $this->source->select(
-           "SELECT $columnsBUtf FROM {$db2}.{$table} as b
-            LEFT JOIN {$db1}.{$table} as a ON $keyCols WHERE $keyNulls1
+           "SELECT $columnsBUtf FROM `{$db2}`.`{$table}` as b
+            LEFT JOIN `{$db1}`.`{$table}` as a ON $keyCols WHERE $keyNulls1
         ");
         $this->source->setFetchMode(\PDO::FETCH_ASSOC);
 
@@ -122,7 +122,7 @@ class LocalTableData {
         $columnsBas = implode(',', $wrapAs($columns2, 'b', 't_'));
         $columnsB   = implode(',', $wrapCast($columns2, 'b'));
         $columnsB0  = implode(',', $wrapNullCheck($columns2, 'b'));
-        
+
         $keyCols = implode(' AND ', array_map(function($el) {
             return "a.{$el} = b.{$el}";
         }, $key));
@@ -133,8 +133,8 @@ class LocalTableData {
                 SELECT $columnsAas, $columnsBas, MD5(concat($columnsA)) AS hash1,
                 MD5(concat($columnsB)) AS hash2,
                 CONCAT($columnsA0) AS nullvalues1, CONCAT($columnsB0) AS nullvalues2
-                FROM {$db1}.{$table} as a
-                INNER JOIN {$db2}.{$table} as b
+                FROM `{$db1}`.`{$table}` as a
+                INNER JOIN `{$db2}`.`{$table}` as b
                 ON $keyCols
             ) t WHERE hash1 <> hash2 || nullvalues1 <> nullvalues2");
         $this->source->setFetchMode(\PDO::FETCH_ASSOC);
