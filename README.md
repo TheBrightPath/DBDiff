@@ -29,6 +29,7 @@ DBDiff is a MIT-licensed open source project with its ongoing development made p
 -   Connects to a source and target database to do the comparison diff, locally and remotely
 -   Diffs can include changes to the schema and/or data, both in valid SQL to bring the target up-to-date with the source
 -   Some tables and/or fields can be ignored in the comparison with a YAML collection in the config file (see File Examples)
+-   List of tables to diff can be specified. If specified it has priority over ignored tables list (see File Examples below)
 -   Diffs are SUPER fast and this tool has been tested with databases of multiple tables of millions of rows
 -   Since this diff tool is being used for migrations, it provides up and down SQL in the same file
 -   Works with existing migration tools like Flyway and Simple DB Migrate by specifying output template files/formats, for example, Simple DB Migrate may work with simple-db-migrate.tmpl which includes: `SQL_UP = u""" {{ $up }} """ SQL_DOWN = u""" {{ $down }} """`
@@ -158,6 +159,10 @@ Instead of looking for `.dbdiff`, this would look for `config.conf` (which shou
 	type: all
 	include: all
 	nocomments: true
+	tablesToDiff:
+	- table1
+	- table2
+	- table3
 	tablesToIgnore:
 	- table1
 	- table2
@@ -170,6 +175,25 @@ Instead of looking for `.dbdiff`, this would look for `config.conf` (which shou
 		table4:
 			- field1
 			- field4
+
+### .dbdiff (with tablesToDif to only diff the given set of tables)
+	server1:
+		user: user
+		password: password
+		port: port # for MySQL this is 3306
+		host: host1 # usually localhost or 127.0.0.1
+	type: all
+	include: all
+	nocomments: true
+	tablesToDiff:
+	- table1
+	- table2
+	- table3
+	fieldsToIgnore:
+		table1:
+			- field1
+			- field2
+			- field3
 
 ### simple-db-migrate.tmpl
 
