@@ -172,7 +172,7 @@ Congratulations you have installed and ran DBDiff!
 
 ## Command-Line API
 
-###### Note: The command-line parameters will always override the settings in the `.dbdiff` config file
+_Note: The command-line parameters will always override the settings in the `.dbdiff` config file_
 
 -   **--server1=user:password@host1:port** - Specify the source db connection details. If there is only one server the --server1 flag can be omitted
 -   **--server2=user:password@host2:port** - Specify the target db connection details (if it’s different to server1)
@@ -323,4 +323,4 @@ We read each and every suggestion that comes through.
 [MIT](http://opensource.org/licenses/MIT)
 
 <p style="display:flex; justify-content:center; align-items: center; align-content: center">Made with &nbsp;:heart:&nbsp; by&nbsp;&nbsp; 
-<a href="https://akalsoftware.com/" target="_blank" rel="noopener noreferrer"><img width="100" valign="center" src="https://d33wubrfki0l68.cloudfront.net/235d6386bc34b2e633b93640a616161b85ee7ba6/1bd9c/assets/images/akalsoftware.svg" alt="Akal Software logo"></a></p>
+<a href="https://akalsoftware.com/" target="_blank" rel="noopener noreferrer"><img width="100" valign="center" src="https://d33wubrfki0l68.cloudfront.net/03c6103a8e7ddc526761f7562ca1a66bfe8436d5/17098/assets/images/akal-logo.svg" alt="Akal Software logo"></a></p>
