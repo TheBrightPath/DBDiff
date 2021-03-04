@@ -94,4 +94,9 @@ class DefaultParams
      */
     public $constraints;
 
+    /**
+     * @inheritdoc
+     */
+    public $memory = '512M';
+
 }

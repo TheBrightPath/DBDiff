@@ -9,9 +9,6 @@ class DBDiff {
     
     public function run() {
 
-        // Increase memory limit
-        ini_set('memory_limit', '512M');
-
         try {
             /** @var \DBDiff\Params\DefaultParams $params */
             $params = ParamsFactory::get();

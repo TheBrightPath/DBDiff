@@ -202,6 +202,28 @@ class Params
 
 
     /**
+     * @param  string  $value
+     *
+     * @return Params
+     */
+    public function setMemory(
+        ?string $value,
+        ?string $default = null
+    ): Params {
+
+        if ( $value ?? $default )
+        {
+            // Increase memory limit
+            ini_set( 'memory_limit', $value ?? $default );
+        }
+
+        $this->memory = ini_get( 'memory_limit' );
+
+        return $this;
+    }
+
+
+    /**
      * @param  string[]  $requires
      *
      * @return Params

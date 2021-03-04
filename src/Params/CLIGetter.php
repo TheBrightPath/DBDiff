@@ -54,6 +54,9 @@ class CLIGetter implements ParamsGetter {
 
             /**  @see \DBDiff\Params\Params::$tablesToIgnore */
             'ignore*:',
+
+            /**  @see \DBDiff\Params\Params::$memory */
+            'memory:',
         ]);
 
         $input = $getopt->get(1);
@@ -78,6 +81,7 @@ class CLIGetter implements ParamsGetter {
         $params->requires       = $getopt->get( '--requires' );
         $params->tablesToDiff   = $getopt->get( '--table' );
         $params->tablesToIgnore = $getopt->get( '--ignore' );
+        $params->memory         = $getopt->get( '--memory' );
 
         return $params;
     }
