@@ -52,7 +52,7 @@ class PhinxGenerator
     ) {
 
         $this->diff       = $diff;
-        $this->params     = $params ?? ParamsFactory::get();
+        $this->params     = $params ?? $params = ParamsFactory::get();
         $this->diffSorter = new DiffSorter();
 
         $dt = new \DateTime( 'now', new \DateTimeZone( 'UTC' ) );
@@ -60,22 +60,23 @@ class PhinxGenerator
         $migrationVersion = $dt->format( static::DATE_FORMAT );
         $className        = "V{$migrationVersion}";
 
-        if ( is_null( $output = $this->params->output ) )
+        if ( is_null( $output = $params->output ) )
         {
-            $this->params->output = getcwd() . "/$migrationVersion.php";
+            $params->output = getcwd() . "/$migrationVersion.php";
         }
-        elseif ( substr( $output, - 1 ) === '/' )
+        elseif ( substr( $output, - 1 ) === '/' || is_dir( rtrim( $output, '/' ) ) )
         {
-            $this->params->output .= "/$migrationVersion.php";
+            $output         = rtrim( $output, '/' );
+            $params->output .= "$output/$migrationVersion.php";
         }
         else
         {
             $className = static::mapFileNameToClassName( basename( $output ) );
         }
 
-        if ( $this->params->defaultTemplateString === null )
+        if ( $params->defaultTemplateString === null )
         {
-            $this->params->defaultTemplateString = <<<PHP
+            $params->defaultTemplateString = <<<PHP
 {{\$php}}
 /**
  * @noinspection AutoloadingIssuesInspection
