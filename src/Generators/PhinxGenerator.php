@@ -90,14 +90,14 @@ use Phinx\Migration\AbstractMigration;
 
 final class {$className} extends AbstractMigration
 {
-    public function up(): void
-    {
-{{\$up}}
-    }
-    
     public function down(): void
     {
 {{\$down}}
+    }
+    
+    public function up(): void
+    {
+{{\$up}}
     }
 }
 
